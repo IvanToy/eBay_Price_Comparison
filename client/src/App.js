@@ -4,7 +4,7 @@ import EbayDataList from "./components/EbayDataList";
 function getSessionStorage(key, value) {
 	const stored = window.sessionStorage.getItem(key);
 	console.log(stored);
-	if (stored.length === 0) {
+	if (!stored) {
 		return value;
 	}
 	return JSON.parse(stored);
