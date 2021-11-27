@@ -30,10 +30,6 @@ a:visited {
 	height: 800px;
 }
 
-.container {
-	display: flexbox;
-}
-
 .underline {
 	width: 12rem;
 	height: 0.25rem;
@@ -42,13 +38,38 @@ a:visited {
 	margin-right: auto;
 }
 
+.input {
+	width: 50%;
+	margin: 1rem auto;
+}
+
+.input-error {
+	width: 50%;
+	margin: 1rem auto;
+	border: 1px solid #b40e0e;
+	background-color: #fddddd;
+}
+
 .itemsDisplayContainer {
-	width: 60%;
+	width: 70%;
 	margin: 3.8rem auto;
 }
 
+.averagePrice {
+	max-width: 300px;
+	background-color: #fff;
+	border-radius: 0.5rem;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s linear;
+	margin: 1rem auto;
+}
+
+.errorInput {
+	color: red;
+}
+
 .itemsDisplay {
-	max-width: 450px;
+	max-width: 500px;
 	background-color: #fff;
 	border-radius: 0.5rem;
 	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);

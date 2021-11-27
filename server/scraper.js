@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import cheerio from "cheerio";
-import mongoose from "mongoose";
+import connectMongoDB from "./mongodbConnection.js";
 import ebayData from "./db.js";
 
 async function ebayScrape(browser, query) {
@@ -46,25 +46,13 @@ async function ebayScrape(browser, query) {
 	}
 }
 
-async function connectMongoDB() {
-	try {
-		mongoose.connect("mongodb://localhost:27017/ebayDataDB", {
-			useNewUrlParser: true,
-		});
-		console.log("Connect to mongodb");
-	} catch (error) {
-		throw new Error(error.message);
-	}
-}
-
 async function main(query) {
 	await connectMongoDB();
 	console.time();
 	const browser = await puppeteer.launch();
-	const scrapedData = await ebayScrape(browser, query);
+	await ebayScrape(browser, query);
 	browser.close();
 	console.timeEnd();
-	return scrapedData;
 }
 
-export { main };
+export default main;

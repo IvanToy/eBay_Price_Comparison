@@ -1,8 +1,7 @@
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
-import { main } from "./scraper.js";
-import ebayData from "./db.js";
+import main from "./scraper.js";
+import calculatedPrices from "./calculations.js";
 
 const app = express();
 const port = 5000;
@@ -13,49 +12,30 @@ const corsOptions = {
 };
 const configuredCors = cors(corsOptions);
 app.options("*", configuredCors);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.post("/ebayData", configuredCors, async (req, res) => {
+let q = [];
+
+app.get("/ebayData", async (req, res) => {
 	try {
-		const data = req.body;
-		const query = data.inputText.split(" ")[0];
-		console.log(data, query);
-		await main(data.inputText);
-		const scrapedData = await ebayData.find({ title: new RegExp(query, "ig") });
-		console.log(scrapedData.length);
-		const finalData = priceCalculations(scrapedData);
-		res.send(finalData);
+		const itemsName = q[q.length - 1];
+		const result = await calculatedPrices(itemsName);
+		res.send(result);
 	} catch (error) {
 		console.error(error);
 	}
 });
 
-function priceCalculations(scrapedData) {
-	let priceArray = [];
-	scrapedData.forEach((item) => {
-		if (item.price >= 100) priceArray.push(item.price);
-	});
-	const averagePrice =
-		priceArray.reduce((sum, num) => sum + num) / priceArray.length;
-	const maxPrice = Math.max(...priceArray);
-	const minPrice = Math.min(...priceArray);
-
-	const cheapestItem = scrapedData.find((item) => {
-		if (item.price === minPrice) {
-			return item;
-		}
-	});
-	const expensiveItem = scrapedData.find((item) => {
-		if (item.price === maxPrice) {
-			return item;
-		}
-	});
-	return {
-		averagePrice,
-		cheapItem: [cheapestItem],
-		expensiveItem: [expensiveItem],
-	};
-}
+app.post("/ebayData", configuredCors, async (req, res) => {
+	try {
+		const data = req.body;
+		q.push(data.itemsName);
+		await main(data.itemsName);
+		res.send({ message: "Posted" });
+	} catch (error) {
+		console.error(error);
+	}
+});
 
 app.listen(port, console.log(`Server is running on port ${port}`));
