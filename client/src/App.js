@@ -4,83 +4,100 @@ import FormSubmitComponent from "./components/FormSubmitComponent";
 import SpinnerComponent from "./UI/Spinner";
 
 function getSessionStorage(key, value) {
-	const stored = sessionStorage.getItem(key);
-	if (!stored) {
-		return value;
-	}
-	return JSON.parse(stored);
+  const stored = sessionStorage.getItem(key);
+  if (!stored) {
+    return value;
+  }
+  return JSON.parse(stored);
 }
 
 function App() {
-	const [ebayData, setEbayData] = useState(getSessionStorage("data", []));
-	const [isLoading, setIsLoading] = useState(false);
+  const [ebayData, setEbayData] = useState(getSessionStorage("data", []));
+  const [isPosted, setIsPosted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-	const fetchData = useCallback(async () => {
-		try {
-			const response = await fetch("http://localhost:5000/ebayData");
-			const data = await response.json();
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch("http://localhost:5000/ebayData");
+      const data = await response.json();
+      const finalData = [];
 
-			setEbayData(data);
-			setIsLoading(false);
-		} catch (error) {
-			console.error(error);
-			setIsLoading(false);
-		}
-	}, []);
+      for (let key in data) {
+        finalData.push({ [key]: data[key] });
+      }
 
-	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+      setEbayData(finalData);
 
-	useEffect(() => {
-		sessionStorage.setItem("data", JSON.stringify(ebayData));
-	}, [ebayData]);
+      setIsLoading(false);
+      setIsPosted(false);
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+      setIsPosted(false);
+    }
+  }, []);
 
-	const onSubmitHandler = async (itemsName) => {
-		setIsLoading(true);
-		try {
-			const options = {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ itemsName }),
-			};
-			const response = await fetch("http://localhost:5000/ebayData", options);
+  useEffect(() => {
+    if (isPosted) {
+      fetchData();
+    }
+  }, [fetchData, isPosted]);
 
-			const data = await response.json();
-			if (data.message === "Posted") {
-				fetchData();
-			}
-		} catch (error) {
-			console.error(error);
-			setIsLoading(false);
-		}
-	};
+  useEffect(() => {
+    sessionStorage.setItem("data", JSON.stringify(ebayData));
+  }, [ebayData]);
+  console.log(ebayData);
+  const onSubmitHandler = async (itemsName) => {
+    setIsLoading(true);
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemsName }),
+      };
+      const response = await fetch("http://localhost:5000/ebayData", options);
 
-	let content;
+      const data = await response.json();
+      if (data.message === "Posted") {
+        setIsPosted(true);
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
 
-	if (ebayData.length === 0) {
-		content = <p>Search for a product.</p>;
-	}
-	if (Object.keys(ebayData).length > 0) {
-		content = <EbayList ebayData={ebayData} />;
-	}
+  let content;
 
-	if (isLoading) {
-		content = <SpinnerComponent />;
-	}
-	return (
-		<div className="container-fluid">
-			<h1>Ebay Price Comparison</h1>
-			<div className="underline"></div>
-			<FormSubmitComponent
-				isLoading={isLoading}
-				onSubmitHandler={onSubmitHandler}
-			/>
-			{content}
-		</div>
-	);
+  if (ebayData.length === 0) {
+    content = <p>Search for a product.</p>;
+  }
+  if (ebayData.length > 0) {
+    const [averagePrice, cheapItem, expensiveItem] = ebayData;
+    const item1 = cheapItem.cheapItem;
+    const item2 = expensiveItem.expensiveItem;
+    const itemsArrays = [item1, item2];
+
+    let price = averagePrice.averagePrice;
+    content = <EbayList price={price} items={itemsArrays} />;
+  }
+
+  if (isLoading) {
+    content = <SpinnerComponent />;
+  }
+  return (
+    <div className="container-fluid">
+      <h1>Ebay Price Comparison</h1>
+      <div className="underline"></div>
+      <FormSubmitComponent
+        isLoading={isLoading}
+        onSubmitHandler={onSubmitHandler}
+      />
+      {content}
+    </div>
+  );
 }
 
 export default App;

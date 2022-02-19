@@ -1,0 +1,32 @@
+{
+  "name": "ebay-price-comparison",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index",
+    "server": "npx nodemon server/index",
+    "client": "npm start --prefix client ",
+    "dev": "concurrently \"npm run server\" \"npm run client\" "
+  },
+  "type": "module",
+  "keywords": [
+    "ebay",
+    "price",
+    "comparison",
+    "puppeteer",
+    "react"
+  ],
+  "author": "Ivan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.10",
+    "concurrently": "^7.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.7",
+    "puppeteer": "^10.2.0"
+  }
+}
