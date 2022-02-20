@@ -33,7 +33,7 @@ function calculatePrices(data) {
   });
   return {
     averagePrice,
-    cheapItem: cheapestItem,
-    expensiveItem: expensiveItem,
+    cheapestItem,
+    expensiveItem,
   };
 }

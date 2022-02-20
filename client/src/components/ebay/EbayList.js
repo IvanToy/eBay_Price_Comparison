@@ -8,7 +8,7 @@ const EbayList = ({ price, items }) => {
       <ul>
         {items.map((item) => (
           <EbayItem
-            key={item.id}
+            key={item._id}
             title={item.title}
             url={item.url}
             price={item.price}

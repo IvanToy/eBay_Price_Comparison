@@ -46,7 +46,7 @@ function App() {
   useEffect(() => {
     sessionStorage.setItem("data", JSON.stringify(ebayData));
   }, [ebayData]);
-  console.log(ebayData);
+
   const onSubmitHandler = async (itemsName) => {
     setIsLoading(true);
     try {
@@ -75,12 +75,10 @@ function App() {
     content = <p>Search for a product.</p>;
   }
   if (ebayData.length > 0) {
-    const [averagePrice, cheapItem, expensiveItem] = ebayData;
-    const item1 = cheapItem.cheapItem;
-    const item2 = expensiveItem.expensiveItem;
-    const itemsArrays = [item1, item2];
+    const [{ averagePrice }, { cheapestItem }, { expensiveItem }] = ebayData;
+    const itemsArrays = [cheapestItem, expensiveItem];
+    let price = averagePrice;
 
-    let price = averagePrice.averagePrice;
     content = <EbayList price={price} items={itemsArrays} />;
   }
 
